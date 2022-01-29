@@ -11,21 +11,18 @@ class TelegramThread(threading.Thread):
     def __init__(self, bot_token: str,
                  chatroom_id: str,
                  logger: logging.Logger = None,
-                 queue_input: Queue = None,
-                 queue_output: Queue = None):
+                 queue_input: Queue = None):
         """
 
         :param bot_token:
         :param chatroom_id:
         :param logger:
         :param queue_input:
-        :param queue_output:
         """
         self.bot_token = bot_token
         self.chatroom_id = chatroom_id
         self.logger = logger if logger else CustomLogger.getLogger()
         self.queue_input = queue_input if queue_input else Queue()
-        self.queue_output = queue_output if queue_output else Queue()
 
         self.bot = TelegramBot(bot_token=self.bot_token,
                                logger=self.logger)
@@ -56,13 +53,6 @@ class TelegramThread(threading.Thread):
         chatroom_id = chatroom_id if chatroom_id else self.chatroom_id
         self.queue_input.put((self.bot.send_photo, (file, chatroom_id)))
 
-    def request_message(self) -> MessageData:
-        if self.queue_output.empty():
-            return
-        message = self.queue_output.get()
-        self.queue_output.task_done()
-        return message
-
     def reconnect(self, max_sec: int = 120) -> None:
         sec_wait = 1
         while True:
@@ -87,7 +77,6 @@ class TelegramThread(threading.Thread):
                 if message:
                     if message.command:
                         self._execute_commands(message.command, message, self.bot)
-                    self.queue_output.put(message)
                     sleep_flag = False
 
                 if not self.queue_input.empty():

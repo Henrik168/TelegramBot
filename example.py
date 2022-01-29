@@ -13,6 +13,12 @@ def reply_time(str_message: MessageData, bot: TelegramBot):
     bot.send_text(message=f"It is: {time.time()}", chatroom_id=str_message.chatroom_id)
 
 
+def send_photo(str_message: MessageData, bot: TelegramBot):
+    with open("./screenshot.png", "rb") as f:
+        image = f.read()
+    bot.send_photo(file=image, chatroom_id=str_message.chatroom_id)
+
+
 def main():
     logger = CustomLogger.getLogger(level=10)
 
@@ -21,16 +27,11 @@ def main():
                                      logger=logger)
     telegram_thread.register_command("/hello", hello)
     telegram_thread.register_command("/time", reply_time)
+    telegram_thread.register_command("/photo", send_photo)
     telegram_thread.start()
     telegram_thread.send_text(message="test")
-    """with open("data/screenshot.png", "rb") as f:
-        image = f.read()
 
-    telegram_thread.send_photo(file=image)"""
     while True:
-        message = telegram_thread.request_message()
-        if message:
-            print(message)
         time.sleep(0.1)
         pass
 
