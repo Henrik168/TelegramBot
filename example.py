@@ -4,7 +4,7 @@ import config
 from TelegramBot.TelegramThread import TelegramThread, TelegramBot, MessageData
 import CustomLogger
 
-log = CustomLogger.getLogger(level=20)
+log = CustomLogger.getLogger(level=10)
 
 
 def hello(message: MessageData, bot: TelegramBot):

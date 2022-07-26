@@ -12,7 +12,6 @@ class TelegramThread(threading.Thread):
     def __init__(self, bot: TelegramBot,
                  queue_input: Queue = None):
         """
-
         :param bot:
         :param queue_input:
         """

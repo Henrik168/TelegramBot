@@ -6,6 +6,7 @@ from CustomLogger.customhandlers import TimedFileHandler, get_path
 def getLogger(name: str = "",
               level: int = 20,
               log_path: str = "./log/") -> logging.Logger:
+
     # create logger
     logger = logging.getLogger(name)
 

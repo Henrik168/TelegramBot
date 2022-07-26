@@ -34,7 +34,6 @@ class TelegramError(Exception):
 class TelegramBot:
     def __init__(self, bot_token: str):
         """
-
         :param bot_token:
         """
         self.bot_token = bot_token
