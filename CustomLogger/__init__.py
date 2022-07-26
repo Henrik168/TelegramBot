@@ -3,7 +3,7 @@ from CustomLogger.customformatter import CustomFormatter, FORMAT
 from CustomLogger.customhandlers import TimedFileHandler, get_path
 
 
-def getLogger(name: str = "CustomLogger",
+def getLogger(name: str = "",
               level: int = 20,
               log_path: str = "./log/") -> logging.Logger:
     # create logger
@@ -14,7 +14,7 @@ def getLogger(name: str = "CustomLogger",
     ch.setFormatter(CustomFormatter())
 
     # create directory if not exists
-    file_path = get_path(name, log_path)
+    file_path = get_path(logger.name, log_path)
 
     # create file handler and set Formatter
     fh = logging.FileHandler(file_path)
