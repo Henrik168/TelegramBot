@@ -59,22 +59,28 @@ class TelegramThread(threading.Thread):
 
     def run(self):
         log.info("Start Telegram Thread.")
-
+        message = None
+        fn, data = None, None
         while True:
             try:
                 sleep_flag = True
 
-                message = self.bot.request_message()
+                if not message:
+                    message = self.bot.request_message()
+
                 if message:
                     log.info(f"Got Message '{message.last_message} from Sender '{message.sender_name} - {message.sender_id} ")
                     if message.command:
                         self._execute_commands(message.command, message, self.bot)
                     sleep_flag = False
+                    message = None
 
-                if not self.queue_input.empty():
-                    fn, data = self.queue_input.get()
+                if not self.queue_input.empty() or data:
+                    if not data:
+                        fn, data = self.queue_input.get()
                     fn(*data)
                     self.queue_input.task_done()
+                    fn, data = None, None
                     sleep_flag = False
 
                 if sleep_flag:
