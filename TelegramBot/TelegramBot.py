@@ -1,4 +1,5 @@
 import logging
+import os
 from dataclasses import dataclass
 from typing import Optional
 import TelegramBot.lib_requests as lib_requests
@@ -68,6 +69,21 @@ class TelegramBot:
             self.send_text(result["description"], chatroom_id)
             raise TelegramError(f"Error sending Photo to Chatroom: {chatroom_id} Response: {result}")
         log.debug(f"Send Photo to chat: {chatroom_id}")
+
+    def send_document(self, file_path: str, chatroom_id: str) -> None:
+        """Send Text Message"""
+        if not os.path.isfile(file_path):
+            raise TelegramError(f"File '{file_path}' does not exists.")
+
+        params = {"chat_id": chatroom_id}
+        files = {"document": open(file=file_path, mode="rb")}
+        result = lib_requests.http_request(self.url + "/sendDocument", params=params, files=files)
+
+        if not result["ok"]:
+            log.error(result)
+            raise TelegramError(f"Error sending Document '{file_path}' to Chatroom{chatroom_id}")
+
+        log.debug(f"Send Document '{file_path}' to Chatroom {chatroom_id}")
 
     def request_message(self) -> Optional[MessageData]:
         """

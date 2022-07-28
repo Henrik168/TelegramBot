@@ -27,6 +27,7 @@ def send_photo(message: MessageData, bot: TelegramBot):
 def main():
     telegram_bot = TelegramBot(bot_token=config.bot_token)
     telegram_bot.send_text(message="Telegrambot set up.", chatroom_id=config.chatroom_id)
+    telegram_bot.send_document(file_path="./log/20220726_root.log", chatroom_id=config.chatroom_id)
     log.info("Bot set up.")
 
     telegram_thread = TelegramThread(bot=telegram_bot)
