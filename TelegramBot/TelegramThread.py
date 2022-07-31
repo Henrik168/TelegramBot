@@ -88,6 +88,9 @@ class TelegramThread(threading.Thread):
 
             except TelegramError as e:
                 log.warning(e)
+                log.warning(f"{e.error_code} - {e.description}")
+                if e.error_code == 502:
+                    self.reconnect(max_sec=1)
             except ConnectionError as e:
                 log.warning(e)
                 self.reconnect(max_sec=64)

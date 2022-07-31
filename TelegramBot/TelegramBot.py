@@ -27,9 +27,11 @@ class MessageData:
 
 
 class TelegramError(Exception):
-    def __init__(self, text: str, chatroom_id: str = 0):
-        self.text = text,
+    def __init__(self, message: str, chatroom_id: str = None, error_code: int = None, description: str = None):
+        self.message = message,
         self.chatroom_id = chatroom_id
+        self.error_code = int(error_code)
+        self.description = description
 
 
 class TelegramBot:
@@ -45,7 +47,7 @@ class TelegramBot:
         """Request Bot Info"""
         result = lib_requests.http_request(self.url + "/getMe")
         if not result["result"]["username"]:
-            raise TelegramError('Missing data result["result"]["username"]')
+            raise TelegramError(f"Missing data result['result']['username']")
         log.debug(f"Request Bot Info: {result}")
         return result["result"]["username"]
 
@@ -54,7 +56,9 @@ class TelegramBot:
         params = {"chat_id": chatroom_id, "text": message}
         result = lib_requests.http_request(self.url + "/sendMessage", params)
         if not result["ok"]:
-            raise TelegramError(f"Error sending Text Message: {message} to Chatroom{chatroom_id}")
+            raise TelegramError(f"Error sending Text Message: {message} to Chatroom {chatroom_id}",
+                                error_code=result["error_code"],
+                                description=result["description"])
         log.debug(f"Send Text Message: {message} to Chatroom {chatroom_id}")
 
     def send_photo(self, file: bytes, chatroom_id: str) -> None:
@@ -66,8 +70,9 @@ class TelegramBot:
         result = lib_requests.http_request(self.url + "/sendPhoto", params, payload)
 
         if not result["ok"]:
-            self.send_text(result["description"], chatroom_id)
-            raise TelegramError(f"Error sending Photo to Chatroom: {chatroom_id} Response: {result}")
+            raise TelegramError(f"Error sending Photo to Chatroom: {chatroom_id} Response: {result}",
+                                error_code=result["error_code"],
+                                description=result["description"])
         log.debug(f"Send Photo to chat: {chatroom_id}")
 
     def send_document(self, file_path: str, chatroom_id: str) -> None:
@@ -81,7 +86,9 @@ class TelegramBot:
 
         if not result["ok"]:
             log.error(result)
-            raise TelegramError(f"Error sending Document '{file_path}' to Chatroom{chatroom_id}")
+            raise TelegramError(f"Error sending Document '{file_path}' to Chatroom{chatroom_id}",
+                                error_code=result["error_code"],
+                                description=result["description"])
 
         log.debug(f"Send Document '{file_path}' to Chatroom {chatroom_id}")
 
@@ -91,16 +98,18 @@ class TelegramBot:
         :return:
         """
         params = {"offset": self.update_id + 1}
-        response = lib_requests.http_request(self.url + "/getUpdates", params)
+        result = lib_requests.http_request(self.url + "/getUpdates", params)
 
-        if not response["ok"]:
-            raise TelegramError(f"Failure in Response: {response}")
+        if not result["ok"]:
+            raise TelegramError(f"Failure in Response: {result}",
+                                error_code=result["error_code"],
+                                description=result["description"])
 
-        if len(response["result"]) == 0:
+        if len(result["result"]) == 0:
             return
 
         # store messages to list of MessageData
-        message = response["result"][0]
+        message = result["result"][0]
         log.debug(f"Got message: {message}")
 
         # store last update ID for requesting just newer Messages
