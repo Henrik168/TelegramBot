@@ -5,7 +5,7 @@ from queue import Queue
 
 from TelegramBot.TelegramBot import TelegramBot, TelegramError, MessageData
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 class TelegramThread(threading.Thread):

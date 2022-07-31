@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional
 import TelegramBot.lib_requests as lib_requests
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 @dataclass
